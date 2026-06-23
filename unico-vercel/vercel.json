@@ -2,6 +2,6 @@
     "version": 2,
     "rewrites": [
           { "source": "/api/proxy/:path*", "destination": "/api/proxy/[...path]" },
-          { "source": "/(.*)", "destination": "/index.html" }
+              { "source": "/(.*)", "destination": "/public/index.html" }
     ]
 }
