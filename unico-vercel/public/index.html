@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unico People — Painel</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0f1117;
+      --bg2: #181c27;
+      --bg3: #1f2437;
+      --border: #2a3050;
+      --accent: #4f6ef7;
+      --accent2: #7c3aed;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --text: #e2e8f0;
+      --text2: #94a3b8;
+      --text3: #64748b;
+      --radius: 10px;
+      --font: 'Inter', system-ui, sans-serif;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 240px;
+      min-height: 100vh;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-logo h1 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.3px;
+    }
+    .sidebar-logo span {
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 500;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px 8px;
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      margin-bottom: 4px;
+    }
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 8px 12px 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text2);
+      transition: all .15s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    .nav-item:hover { background: var(--bg3); color: var(--text); }
+    .nav-item.active { background: rgba(79,110,247,.15); color: var(--accent); }
+    .nav-item .icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+
+    .sidebar-footer {
+      padding: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .env-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(34,197,94,.1);
+      color: var(--green);
+      padding: 5px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(34,197,94,.2);
+    }
+    .env-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: 240px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-title { font-size: 15px; font-weight: 600; }
+    .topbar-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all .15s;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #3d5ce8; }
+    .btn-ghost { background: var(--bg3); color: var(--text2); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); border-color: #3a4070; }
+    .btn-danger { background: rgba(239,68,68,.1); color: var(--red); border: 1px solid rgba(239,68,68,.2); }
+    .btn-danger:hover { background: rgba(239,68,68,.2); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    .content { padding: 28px; flex: 1; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .card-title { font-size: 14px; font-weight: 600; }
+    .card-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+    /* ── GRID ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+    /* ── STAT CARDS ── */
+    .stat-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+    .stat-label { font-size: 11px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+    .stat-value { font-size: 28px; font-weight: 700; margin: 6px 0 2px; }
+    .stat-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    /* ── FORM ── */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; font-weight: 500; color: var(--text2); }
+    input, select, textarea {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--text);
+      font-family: var(--font);
+      transition: border-color .15s;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    input::placeholder, textarea::placeholder { color: var(--text3); }
+    select option { background: var(--bg3); }
+    textarea { resize: vertical; min-height: 80px; }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(42,48,80,.5);
+      color: var(--text2);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(79,110,247,.04); }
+
+    /* ── STATUS BADGES ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-210 { background: rgba(245,158,11,.1); color: var(--yellow); }
+    .badge-220 { background: rgba(79,110,247,.1); color: var(--accent); }
+    .badge-230 { background: rgba(245,158,11,.1); color: var(--yellow); }
+    .badge-240 { background: rgba(124,58,237,.1); color: var(--accent2); }
+    .badge-400 { background: rgba(34,197,94,.1); color: var(--green); }
+    .badge-500 { background: rgba(100,116,139,.1); color: var(--text3); }
+    .badge-501 { background: rgba(239,68,68,.1); color: var(--red); }
+
+    /* ── JSON VIEWER ── */
+    .json-output {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 14px;
+      font-family: 'Fira Code', monospace;
+      font-size: 12px;
+      color: #a8b4d4;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* ── LOADING / EMPTY ── */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 40px;
+      color: var(--text3);
+      font-size: 14px;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--text3);
+    }
+    .empty .icon { font-size: 36px; margin-bottom: 10px; }
+    .empty p { font-size: 14px; }
+
+    /* ── TOAST ── */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toast {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 12px 16px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 260px;
+      max-width: 380px;
+      animation: slideIn .2s ease;
+      box-shadow: 0 8px 30px rgba(0,0,0,.4);
+    }
+    .toast.success { border-left: 3px solid var(--green); }
+    .toast.error { border-left: 3px solid var(--red); }
+    .toast.info { border-left: 3px solid var(--accent); }
+    @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } }
+
+    /* ── TABS ── */
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: -1px; }
+    .tab {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text3);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all .15s;
+    }
+    .tab:hover { color: var(--text2); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ── PAGE ── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 560px;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-title { font-size: 15px; font-weight: 600; }
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text3);
+      cursor: pointer;
+      font-size: 20px;
+      padding: 2px 6px;
+    }
+    .modal-close:hover { color: var(--text); }
+    .modal-body { padding: 22px; }
+    .modal-footer { padding: 16px 22px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+    code {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 12px;
+      font-family: monospace;
+      color: #a8b4d4;
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <h1>Unico People</h1>
+    <span>Painel de Gestão</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Visão Geral</div>
+      <button class="nav-item active" onclick="showPage('dashboard')">
+        <span class="icon">📊</span> Dashboard
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Admissões</div>
+      <button class="nav-item" onclick="showPage('positions')">
+        <span class="icon">📋</span> Posições
+      </button>
+      <button class="nav-item" onclick="showPage('documents')">
+        <span class="icon">📄</span> Documentos
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Estrutura</div>
+      <button class="nav-item" onclick="showPage('organization')">
+        <span class="icon">🏢</span> Organização
+      </button>
+      <button class="nav-item" onclick="showPage('roles')">
+        <span class="icon">👤</span> Cargos
+      </button>
+      <button class="nav-item" onclick="showPage('departments')">
+        <span class="icon">🗂️</span> Departamentos
+      </button>
+      <button class="nav-item" onclick="showPage('benefits')">
+        <span class="icon">💎</span> Benefícios
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Integrações</div>
+      <button class="nav-item" onclick="showPage('webhooks')">
+        <span class="icon">🔗</span> Webhooks
+      </button>
+      <button class="nav-item" onclick="showPage('attachments')">
+        <span class="icon">📎</span> Anexos
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Utilitários</div>
+      <button class="nav-item" onclick="showPage('ibge')">
+        <span class="icon">🗺️</span> Código IBGE
+      </button>
+      <button class="nav-item" onclick="showPage('explorer')">
+        <span class="icon">🔍</span> API Explorer
+      </button>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="env-badge">Produção</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title" id="page-title">Dashboard</div>
+      <div class="topbar-sub" id="page-sub">Visão geral da conta</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-ghost" onclick="refreshPage()">↻ Atualizar</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="grid-4" id="stat-cards">
+        <div class="stat-card"><div class="stat-label">Total Posições</div><div class="stat-value" id="stat-total">—</div></div>
+        <div class="stat-card"><div class="stat-label">Concluídas</div><div class="stat-value" id="stat-completed" style="color:var(--green)">—</div></div>
+        <div class="stat-card"><div class="stat-label">Em Andamento</div><div class="stat-value" id="stat-pending" style="color:var(--accent)">—</div></div>
+        <div class="stat-card"><div class="stat-label">Arquivadas</div><div class="stat-value" id="stat-archived" style="color:var(--text3)">—</div></div>
+      </div>
+
+      <div style="margin-top:20px;" class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Posições Recentes</div><div class="card-sub">Últimas admissões</div></div>
+            <button class="btn btn-ghost" onclick="showPage('positions')" style="font-size:12px">Ver todas</button>
+          </div>
+          <div id="dashboard-positions"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div><div class="card-title">Organização</div><div class="card-sub">Empresas e filiais</div></div>
+          </div>
+          <div id="dashboard-org"><div class="loading"><div class="spinner"></div> Carregando...</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POSIÇÕES -->
+    <div class="page" id="page-positions">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Filtrar Posições</div></div>
+          <button class="btn btn-primary" onclick="openModal('modal-position')">+ Nova Posição</button>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Conta (acc) *</label>
+            <input id="pos-acc" type="text" placeholder="UID da empresa ou filial" />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="pos-status">
+              <option value="">Todos</option>
+              <option value="210">210 - Invited</option>
+              <option value="220">220 - Pending</option>
+              <option value="230">230 - Review</option>
+              <option value="240">240 - Analysis</option>
+              <option value="400">400 - Completed</option>
+              <option value="500">500 - Archived</option>
+              <option value="501">501 - Declined</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Limite</label>
+            <input id="pos-limit" type="number" value="20" min="1" max="100" />
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end;">
+            <button class="btn btn-primary" onclick="loadPositions()" style="width:100%">Buscar</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="table-wrap" id="positions-table">
+          <div class="empty"><div class="icon">📋</div><p>Preencha o campo Conta e clique em Buscar</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTOS -->
+    <div class="page" id="page-documents">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Tipos de Documentos Disponíveis</div><div class="card-sub">Documentos configurados na plataforma</div></div>
+          <button class="btn btn-primary" onclick="loadDocuments()">Carregar</button>
+        </div>
+        <div id="documents-content"><div class="empty"><div class="icon">📄</div><p>Clique em Carregar para listar os documentos disponíveis</p></div></div>
+      </div>
+    </div>
+
+    <!-- ORGANIZAÇÃO -->
+    <div class="page" id="page-organization">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Estrutura da Organização</div><div class="card-sub">Grupos, empresas e filiais</div></div>
+          <button class="btn btn-primary" onclick="loadOrganization()">Carregar</button>
+        </div>
+        <div id="org-content"><div class="empty"><div class="icon">🏢</div><p>Clique em Carregar para visualizar a organização</p></div></div>
+      </div>
+      <div class="card" id="units-card" style="display:none">
+        <div class="card-header">
+          <div><div class="card-title">Filiais</div><div class="card-sub" id="units-sub">—</div></div>
+        </div>
+        <div id="units-content"></div>
+      </div>
+    </div>
+
+    <!-- CARGOS -->
+    <div class="page" id="page-roles">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Cargos</div></div>
+          <button class="btn btn-primary" onclick="openModal('modal-role')">+ Novo Cargo</button>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Conta (acc) *</label>
+            <input id="roles-acc" type="text" placeholder="UID da empresa" />
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end;">
+            <button class="btn btn-primary" onclick="loadRoles()" style="width:100%">Buscar</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div id="roles-content"><div class="empty"><div class="icon">👤</div><p>Preencha a Conta e busque</p></div></div>
+      </div>
+    </div>
+
+    <!-- DEPARTAMENTOS -->
+    <div class="page" id="page-departments">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Departamentos</div></div>
+          <button class="btn btn-primary" onclick="openModal('modal-dept')">+ Novo Departamento</button>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Conta (acc) *</label>
+            <input id="depts-acc" type="text" placeholder="UID da empresa" />
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end;">
+            <button class="btn btn-primary" onclick="loadDepartments()" style="width:100%">Buscar</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div id="depts-content"><div class="empty"><div class="icon">🗂️</div><p>Preencha a Conta e busque</p></div></div>
+      </div>
+    </div>
+
+    <!-- BENEFÍCIOS -->
+    <div class="page" id="page-benefits">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Grupos de Benefícios</div></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Conta (account) *</label>
+            <input id="benefits-acc" type="text" placeholder="UID da empresa" />
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end;">
+            <button class="btn btn-primary" onclick="loadBenefits()" style="width:100%">Buscar</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div id="benefits-content"><div class="empty"><div class="icon">💎</div><p>Preencha a Conta e busque</p></div></div>
+      </div>
+    </div>
+
+    <!-- WEBHOOKS -->
+    <div class="page" id="page-webhooks">
+      <div class="card">
+        <div class="card-header">
+          <div><div class="card-title">Webhooks</div><div class="card-sub">Notificações de eventos de posição</div></div>
+          <button class="btn btn-primary" onclick="openModal('modal-webhook')">+ Criar Webhook</button>
+        </div>
+        <div style="padding: 10px 0;">
+          <p style="font-size:13px;color:var(--text3)">Eventos disponíveis:</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+            <code>position-created</code>
+            <code>position-applied</code>
+            <code>position-completed</code>
+            <code>position-archived</code>
+            <code>position-declined</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANEXOS -->
+    <div class="page" id="page-attachments">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Anexos por Conta</div></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Conta (acc) *</label>
+            <input id="attach-acc" type="text" placeholder="UID da empresa" />
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end;">
+            <button class="btn btn-primary" onclick="loadAttachments()" style="width:100%">Buscar</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div id="attach-content"><div class="empty"><div class="icon">📎</div><p>Preencha a Conta e busque</p></div></div>
+      </div>
+    </div>
+
+    <!-- IBGE -->
+    <div class="page" id="page-ibge">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Consultar Código IBGE</div></div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>UF *</label>
+            <input id="ibge-uf" type="text" placeholder="Ex: SP" maxlength="2" style="text-transform:uppercase" />
+          </div>
+          <div class="form-group">
+            <label>Município *</label>
+            <input id="ibge-city" type="text" placeholder="Ex: São Paulo" />
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="lookupIBGE()">Consultar</button>
+        <div id="ibge-result" style="margin-top:16px;"></div>
+      </div>
+    </div>
+
+    <!-- API EXPLORER -->
+    <div class="page" id="page-explorer">
+      <div class="card">
+        <div class="card-header"><div class="card-title">API Explorer</div><div class="card-sub">Faça chamadas diretas à API</div></div>
+        <div class="form-row">
+          <div class="form-group" style="grid-column:1">
+            <label>Método</label>
+            <select id="exp-method">
+              <option>GET</option><option>POST</option><option>PUT</option>
+              <option>PATCH</option><option>DELETE</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Endpoint</label>
+            <input id="exp-endpoint" type="text" placeholder="Ex: /positions?acc=xxx" />
+          </div>
+          <div class="form-group full">
+            <label>Body (JSON)</label>
+            <textarea id="exp-body" placeholder='{"key": "value"}'></textarea>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="runExplorer()">▶ Executar</button>
+        <hr class="divider" />
+        <div id="exp-result"><div class="empty"><div class="icon">🔍</div><p>Execute uma chamada para ver o resultado</p></div></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODALS -->
+
+<!-- Nova Posição -->
+<div class="modal-overlay" id="modal-position">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Nova Posição</div>
+      <button class="modal-close" onclick="closeModal('modal-position')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group"><label>Unit (UID filial) *</label><input id="new-unit" type="text" /></div>
+        <div class="form-group"><label>Nome do candidato *</label><input id="new-name" type="text" /></div>
+        <div class="form-group"><label>Email *</label><input id="new-email" type="email" /></div>
+        <div class="form-group"><label>Celular *</label><input id="new-mobile" type="text" placeholder="11999999999" /></div>
+        <div class="form-group"><label>Cargo (UID) *</label><input id="new-role" type="text" /></div>
+        <div class="form-group"><label>Departamento (UID) *</label><input id="new-dept" type="text" /></div>
+        <div class="form-group"><label>Vínculo *</label>
+          <select id="new-vinculo">
+            <option value="clt">CLT</option>
+            <option value="estagio">Estágio</option>
+            <option value="aprendiz">Aprendiz</option>
+            <option value="autonomo">Autônomo</option>
+            <option value="temporario">Temporário</option>
+            <option value="intermitente">Intermitente</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Data Limite *</label><input id="new-limit-date" type="date" /></div>
+        <div class="form-group"><label>Data Admissão</label><input id="new-admission" type="date" /></div>
+        <div class="form-group"><label>Matrícula</label><input id="new-matricula" type="text" /></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-position')">Cancelar</button>
+      <button class="btn btn-primary" onclick="createPosition()">Criar Posição</button>
+    </div>
+  </div>
+</div>
+
+<!-- Novo Cargo -->
+<div class="modal-overlay" id="modal-role">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Novo Cargo</div>
+      <button class="modal-close" onclick="closeModal('modal-role')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group full"><label>Conta (acc) *</label><input id="role-acc" type="text" /></div>
+        <div class="form-group full"><label>Nome do Cargo *</label><input id="role-name" type="text" /></div>
+        <div class="form-group"><label>Código (opcional)</label><input id="role-code" type="text" /></div>
+        <div class="form-group"><label>CBO</label><input id="role-cbo" type="text" /></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-role')">Cancelar</button>
+      <button class="btn btn-primary" onclick="createRole()">Criar Cargo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Novo Departamento -->
+<div class="modal-overlay" id="modal-dept">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Novo Departamento</div>
+      <button class="modal-close" onclick="closeModal('modal-dept')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group full"><label>Conta (acc) *</label><input id="dept-acc" type="text" /></div>
+        <div class="form-group full"><label>Nome do Departamento *</label><input id="dept-name" type="text" /></div>
+        <div class="form-group full"><label>Código (opcional)</label><input id="dept-code" type="text" /></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-dept')">Cancelar</button>
+      <button class="btn btn-primary" onclick="createDept()">Criar Departamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- Novo Webhook -->
+<div class="modal-overlay" id="modal-webhook">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Criar Webhook</div>
+      <button class="modal-close" onclick="closeModal('modal-webhook')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group full"><label>URL de Callback *</label><input id="wh-url" type="url" placeholder="https://meuservidor.com/webhook" /></div>
+        <div class="form-group full"><label>Eventos (separados por vírgula) *</label><input id="wh-events" type="text" placeholder="position-created,position-completed" /></div>
+        <div class="form-group"><label>Tipo de Auth</label>
+          <select id="wh-auth-type" onchange="toggleWebhookAuth()">
+            <option value="">Nenhum</option>
+            <option value="secret">Secret (HMAC)</option>
+            <option value="basic">Basic</option>
+            <option value="apiKey">API Key</option>
+          </select>
+        </div>
+        <div class="form-group" id="wh-auth-value-group" style="display:none">
+          <label id="wh-auth-label">Valor</label>
+          <input id="wh-auth-value" type="text" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-webhook')">Cancelar</button>
+      <button class="btn btn-primary" onclick="createWebhook()">Criar Webhook</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<script>
+  const STATUS_LABELS = {
+    210: 'Invited', 220: 'Pending', 230: 'Review',
+    240: 'Analysis', 400: 'Completed', 500: 'Archived', 501: 'Declined'
+  };
+
+  const PAGE_META = {
+    dashboard: ['Dashboard', 'Visão geral da conta'],
+    positions: ['Posições', 'Gerenciar admissões e candidatos'],
+    documents: ['Documentos', 'Tipos de documentos disponíveis'],
+    organization: ['Organização', 'Estrutura de empresas e filiais'],
+    roles: ['Cargos', 'Gerenciar cargos da empresa'],
+    departments: ['Departamentos', 'Gerenciar departamentos'],
+    benefits: ['Benefícios', 'Grupos de benefícios'],
+    webhooks: ['Webhooks', 'Notificações de eventos'],
+    attachments: ['Anexos', 'Arquivos anexados por conta'],
+    ibge: ['Código IBGE', 'Consultar código de município'],
+    explorer: ['API Explorer', 'Chamadas diretas à API Unico People'],
+  };
+
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(`page-${name}`).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => {
+      if (n.textContent.trim().toLowerCase().includes(PAGE_META[name]?.[0]?.toLowerCase().split(' ')[0])) {
+        n.classList.add('active');
+      }
+    });
+    const [title, sub] = PAGE_META[name] || [name, ''];
+    document.getElementById('page-title').textContent = title;
+    document.getElementById('page-sub').textContent = sub;
+    if (name === 'dashboard') loadDashboard();
+  }
+
+  function refreshPage() {
+    const active = document.querySelector('.page.active')?.id?.replace('page-', '');
+    if (active) showPage(active);
+  }
+
+  // ── API CALLS ──
+  async function api(method, path, body) {
+    const opts = {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+    };
+    if (body && method !== 'GET') opts.body = JSON.stringify(body);
+    const res = await fetch(`/api/proxy${path}`, opts);
+    const data = await res.json();
+    if (!res.ok) throw data;
+    return data;
+  }
+
+  // ── TOAST ──
+  function toast(msg, type = 'info') {
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.innerHTML = `<span>${type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ'}</span> ${msg}`;
+    document.getElementById('toast-container').appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+
+  // ── DASHBOARD ──
+  async function loadDashboard() {
+    try {
+      const orgData = await api('GET', '/organization');
+      const items = orgData?.data || orgData?.items || (Array.isArray(orgData) ? orgData : []);
+      document.getElementById('dashboard-org').innerHTML = items.length
+        ? `<div class="table-wrap"><table><thead><tr><th>Nome</th><th>UID</th></tr></thead><tbody>
+            ${items.map(o => `<tr><td style="color:var(--text)">${o.name || o.nome || '—'}</td><td><code>${o.uid || o.id || '—'}</code></td></tr>`).join('')}
+           </tbody></table></div>`
+        : `<div class="json-output">${JSON.stringify(orgData, null, 2)}</div>`;
+    } catch(e) {
+      document.getElementById('dashboard-org').innerHTML = `<div class="empty"><div class="icon">⚠️</div><p>${e.error || 'Erro ao carregar'}</p></div>`;
+    }
+    document.getElementById('stat-total').textContent = '—';
+    document.getElementById('stat-completed').textContent = '—';
+    document.getElementById('stat-pending').textContent = '—';
+    document.getElementById('stat-archived').textContent = '—';
+    document.getElementById('dashboard-positions').innerHTML = '<div class="empty"><div class="icon">💡</div><p>Vá em Posições, selecione uma conta e busque</p></div>';
+  }
+
+  // ── POSITIONS ──
+  async function loadPositions() {
+    const acc = document.getElementById('pos-acc').value.trim();
+    if (!acc) { toast('Informe o UID da conta', 'error'); return; }
+    const status = document.getElementById('pos-status').value;
+    const limit = document.getElementById('pos-limit').value || 20;
+    const el = document.getElementById('positions-table');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div> Buscando...</div>';
+    try {
+      let url = `/positions?acc=${acc}&limit=${limit}`;
+      if (status) url += `&status=${status}`;
+      const data = await api('GET', url);
+      const items = data?.data || data?.items || data?.positions || (Array.isArray(data) ? data : []);
+      if (!items.length) { el.innerHTML = '<div class="empty"><div class="icon">📋</div><p>Nenhuma posição encontrada</p></div>'; return; }
+      el.innerHTML = `<table><thead><tr>
+        <th>Candidato</th><th>Status</th><th>Vínculo</th><th>Data Admissão</th><th>UID</th><th></th>
+      </tr></thead><tbody>
+        ${items.map(p => `<tr>
+          <td style="color:var(--text)">${p.profile?.name || p.name || '—'}</td>
+          <td><span class="badge badge-${p.status}">${STATUS_LABELS[p.status] || p.status}</span></td>
+          <td>${p.payment?.bond || p.vinculo || '—'}</td>
+          <td>${p.admission_date || p.admissionDate || '—'}</td>
+          <td><code>${p.uid || p.id || '—'}</code></td>
+          <td><button class="btn btn-ghost" style="font-size:11px;padding:4px 10px" onclick="showPositionDetail('${p.uid || p.id}')">Ver</button></td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch(e) {
+      el.innerHTML = `<div class="empty"><div class="icon">⚠️</div><p>${e.detail?.message || e.error || 'Erro'}</p></div>`;
+    }
+  }
+
+  async function showPositionDetail(uid) {
+    try {
+      const data = await api('GET', `/positions/${uid}?includes=role,department,persons,unit`);
+      const win = window.open('', '_blank', 'width=700,height=600');
+      win.document.write(`<pre style="background:#0f1117;color:#e2e8f0;padding:20px;font-size:13px;font-family:monospace">${JSON.stringify(data, null, 2)}</pre>`);
+    } catch(e) { toast('Erro ao carregar posição', 'error'); }
+  }
+
+  async function createPosition() {
+    const body = {
+      unit: document.getElementById('new-unit').value,
+      profile: {
+        name: document.getElementById('new-name').value,
+        email: document.getElementById('new-email').value,
+        mobile: document.getElementById('new-mobile').value,
+      },
+      role: document.getElementById('new-role').value,
+      department: document.getElementById('new-dept').value,
+      pagamento: { vinculo: document.getElementById('new-vinculo').value },
+      limit_date: document.getElementById('new-limit-date').value,
+      admission_date: document.getElementById('new-admission').value || undefined,
+      num_matricula: document.getElementById('new-matricula').value || undefined,
+    };
+    try {
+      await api('POST', '/positions', body);
+      toast('Posição criada com sucesso!', 'success');
+      closeModal('modal-position');
+    } catch(e) { toast(e.detail?.message || 'Erro ao criar posição', 'error'); }
+  }
+
+  // ── DOCUMENTS ──
+  async function loadDocuments() {
+    const el = document.getElementById('documents-content');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div> Carregando...</div>';
+    try {
+      const data = await api('GET', '/available-documents');
+      const items = data?.data || (Array.isArray(data) ? data : []);
+      if (!items.length) { el.innerHTML = `<div class="json-output">${JSON.stringify(data, null, 2)}</div>`; return; }
+      el.innerHTML = `<table><thead><tr><th>Nome/Slug</th><th>ID</th><th>Kind</th></tr></thead><tbody>
+        ${items.map(d => `<tr>
+          <td style="color:var(--text)">${d.slug || d.name || '—'}</td>
+          <td><code>${d.id || '—'}</code></td>
+          <td><span class="badge badge-220">${d.kind || '—'}</span></td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch(e) { el.innerHTML = `<div class="empty"><div class="icon">⚠️</div><p>${e.error || 'Erro'}</p></div>`; }
+  }
+
+  // ── ORGANIZATION ──
+  async function loadOrganization() {
+    const el = document.getElementById('org-content');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div> Carregando...</div>';
+    try {
+      const data = await api('GET', '/organization');
+      const items = data?.data || data?.items || (Array.isArray(data) ? data : []);
+      if (!items.length) { el.innerHTML = `<div class="json-output">${JSON.stringify(data, null, 2)}</div>`; return; }
+      el.innerHTML = `<table><thead><tr><th>Nome</th><th>UID</th><th></th></tr></thead><tbody>
+        ${items.map(o => `<tr>
+          <td style="color:var(--text)">${o.name || o.nome || '—'}</td>
+          <td><code>${o.uid || o.id || '—'}</code></td>
+          <td><button class="btn btn-ghost" style="font-size:11px;padding:4px 10px" onclick="loadUnits('${o.uid || o.id}','${o.name || ''}')">Ver filiais</button></td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch(e) { el.innerHTML = `<div class="empty"><div class="icon">⚠️</div><p>${e.error || 'Erro'}</p></div>`; }
+  }
+
+  async function loadUnits(acc, name) {
+    document.getElementById('units-card').style.display = 'block';
+    document.getElementById('units-sub').textContent = name;
+    const el = document.getElementById('units-content');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    try {
+      const data = await api('GET', `/organization/${acc}/units`);
+      const items = data?.data || data?.items || (Array.isArray(data) ? data : []);
+      el.innerHTML = items.length
+        ? `<table><thead><tr><th>Filial</th><th>UID</th></tr></thead><tbody>
+            ${items.map(u => `<tr><td style="color:var(--text)">${u.name || '—'}</td><td><code>${u.uid || u.id || '—'}</code></td></tr>`).join('')}
+           </tbody></table>`
+        : `<div class="json-output">${JSON.stringify(data, null, 2)}</div>`;
+    } catch(e) { el.innerHTML = `<div class="empty"><div class="icon">⚠️</div><p>${e.error || 'Erro'}</p></div>`; }
+  }
+
+  // ── ROLES ──
+  async function loadRoles() {
+    const acc = document.getElementById('roles-acc').value.trim();
+    if (!acc) { toast('Informe o UID da conta', 'error'); return; }
+    const el = document.getElementById('roles-content');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    try {
+      const data = await api('GET', `/roles/${acc}?limit=100`);
+      const items = data?.data || (Array.isArray(data) ? data : []);
+      el.innerHTML = items.length
+        ? `<table><thead><tr><th>Nome</th><th>Código</th><th>CBO</th><th>UID</th></tr></thead><tbody>
+            ${items.map(r => `<tr>
+              <td style="color:var(--text)">${r.name || '—'}</td>
+              <td>${r.code || '—'}</td>
+              <td>${r.context?.brazil?.cbo || '—'}</td>
+              <td><code>${r.uid || r.id || '—'}</code></td>
+            </tr>`).join('')}
+           </tbody></table>`
+        : `<div class="json-output">${JSON.stringify(data, null, 2)}</div>`;
+    } catch(e) { el.innerHTML = `<div class="empty"><div class="icon">⚠️</div><p>${e.error || 'Erro'}</p></div>`; }
+  }
+
+  async function createRole() {
+    const acc = document.getElementById('role-acc').value;
+    const body = {
+      name: document.getElementById('role-name').value,
+      code: document.getElementById('role-code').value || undefined,
+      context: { brazil: { cbo: document.getElementById('role-cbo').value || undefined } },
+    };
+    try {
+      await api('POST', `/roles/${acc}`, body);
+      toast('Cargo criado!', 'success');
+      closeModal('modal-role');
+      document.getElementById('roles-acc').value = acc;
+      loadRoles();
+    } catch(e) { toast(e.detail?.message || 'Erro', 'error'); }
+  }
+
+  // ── DEPARTMENTS ──
+  async function loadDepartments() {
+    const acc = document.getElementById('depts-acc').value.trim();
+    if (!acc) { toast('Informe o UID da conta', 'error'); return; }
+    const el = document.getElementById('depts-content');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    try {
+      const data = await api('GET', `/departments/${acc}?limit=100`);
+      const items = data?.data || (Array.isArray(data) ? data : []);
+      el.innerHTML = items.length
+        ? `<table><thead><tr><th>Nome</th><th>Código</th><th>UID</th></tr></thead><tbody>
+            ${items.map(d => `<tr>
+              <td style="color:var(--text)">${d.name || '—'}</td>
+              <td>${d.code || '—'}</td>
+              <td><code>${d.uid || d.id || '—'}</code></td>
+            </tr>`).join('')}
+           </tbody></table>`
+        : `<div class="json-output">${JSON.stringify(data, null, 2)}</div>`;
+    } catch(e) { el.innerHTML = `<div class="empty"><div class="icon">⚠️</div><p>${e.error || 'Erro'}</p></div>`; }
+  }
+
+  async function createDept() {
+    const acc = document.getElementById('dept-acc').value;
+    const body = {
+      name: document.getElementById('dept-name').value,
+      code: document.getElementById('dept-code').value || undefined,
+    };
+    try {
+      await api('POST', `/departments/${acc}`, body);
+      toast('Departamento criado!', 'success');
+      closeModal('modal-dept');
+      document.getElementById('depts-acc').value = acc;
+      loadDepartments();
+    } catch(e) { toast(e.detail?.message || 'Erro', 'error'); }
+  }
+
+  // ── BENEFITS ──
+  async function loadBenefits() {
+    const acc = document.getElementById('benefits-acc').value.trim();
+    if (!acc) { toast('Informe o UID da conta', 'error'); return; }
+    const el = document.getElementById('benefits-content');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    try {
+      const data = await api('GET', `/benefits?account=${acc}`);
+      const items = data?.data || (Array.isArray(data) ? data : []);
+      el.innerHTML = items.length
+        ? `<table><thead><tr><th>Nome</th><th>Categoria</th><th>UID</th></tr></thead><tbody>
+            ${items.map(b => `<tr>
+              <td style="color:var(--text)">${b.name || '—'}</td>
+              <td>${b.category || '—'}</td>
+              <td><code>${b.uid || b.id || '—'}</code></td>
+            </tr>`).join('')}
+           </tbody></table>`
+        : `<div class="json-output">${JSON.stringify(data, null, 2)}</div>`;
+    } catch(e) { el.innerHTML = `<div class="empty"><div class="icon">⚠️</div><p>${e.error || 'Erro'}</p></div>`; }
+  }
+
+  // ── ATTACHMENTS ──
+  async function loadAttachments() {
+    const acc = document.getElementById('attach-acc').value.trim();
+    if (!acc) { toast('Informe o UID da conta', 'error'); return; }
+    const el = document.getElementById('attach-content');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    try {
+      const data = await api('GET', `/attachments/${acc}`);
+      const items = data?.data || (Array.isArray(data) ? data : []);
+      el.innerHTML = items.length
+        ? `<table><thead><tr><th>Categoria</th><th>Nome</th><th>Tipo</th><th>Tamanho</th><th>ID</th></tr></thead><tbody>
+            ${items.map(a => `<tr>
+              <td style="color:var(--text)">${a.categoryName || '—'}</td>
+              <td>${a.file?.name || '—'}</td>
+              <td><code>${a.file?.mime || '—'}</code></td>
+              <td>${a.file?.size ? Math.round(a.file.size/1024)+'kb' : '—'}</td>
+              <td><code>${a.attachmentID || '—'}</code></td>
+            </tr>`).join('')}
+           </tbody></table>`
+        : `<div class="json-output">${JSON.stringify(data, null, 2)}</div>`;
+    } catch(e) { el.innerHTML = `<div class="empty"><div class="icon">⚠️</div><p>${e.error || 'Erro'}</p></div>`; }
+  }
+
+  // ── IBGE ──
+  async function lookupIBGE() {
+    const uf = document.getElementById('ibge-uf').value.trim().toUpperCase();
+    const city = document.getElementById('ibge-city').value.trim();
+    if (!uf || !city) { toast('Preencha UF e Município', 'error'); return; }
+    const el = document.getElementById('ibge-result');
+    el.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+    try {
+      const data = await api('GET', `/ibge?uf=${uf}&city=${encodeURIComponent(city)}`);
+      el.innerHTML = `<div class="card" style="display:inline-block">
+        <div class="stat-label">Código IBGE</div>
+        <div class="stat-value" style="color:var(--accent)">${data.code || '—'}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px">${city} / ${uf}</div>
+      </div>`;
+    } catch(e) { el.innerHTML = `<div style="color:var(--red);font-size:14px">⚠️ ${e.error || 'Não encontrado'}</div>`; }
+  }
+
+  // ── WEBHOOKS ──
+  function toggleWebhookAuth() {
+    const type = document.getElementById('wh-auth-type').value;
+    const group = document.getElementById('wh-auth-value-group');
+    const lbl = document.getElementById('wh-auth-label');
+    group.style.display = type ? 'flex' : 'none';
+    if (type === 'secret') lbl.textContent = 'Secret Key';
+    else if (type === 'basic') lbl.textContent = 'user:senha (base64)';
+    else if (type === 'apiKey') lbl.textContent = 'API Key';
+  }
+
+  async function createWebhook() {
+    const authType = document.getElementById('wh-auth-type').value;
+    const body = {
+      url: document.getElementById('wh-url').value,
+      events: document.getElementById('wh-events').value.split(',').map(s => s.trim()),
+      auth: authType ? { type: authType, value: document.getElementById('wh-auth-value').value } : undefined,
+    };
+    try {
+      await api('POST', '/webhooks', body);
+      toast('Webhook criado!', 'success');
+      closeModal('modal-webhook');
+    } catch(e) { toast(e.detail?.message || 'Erro', 'error'); }
+  }
+
+  // ── EXPLORER ──
+  async function runExplorer() {
+    const method = document.getElementById('exp-method').value;
+    const endpoint = document.getElementById('exp-endpoint').value.trim();
+    const bodyStr = document.getElementById('exp-body').value.trim();
+    const el = document.getElementById('exp-result');
+    if (!endpoint) { toast('Informe o endpoint', 'error'); return; }
+    el.innerHTML = '<div class="loading"><div class="spinner"></div> Executando...</div>';
+    try {
+      let body;
+      if (bodyStr) body = JSON.parse(bodyStr);
+      const data = await api(method, endpoint, body);
+      el.innerHTML = `<div class="json-output">${JSON.stringify(data, null, 2)}</div>`;
+    } catch(e) {
+      el.innerHTML = `<div class="json-output" style="color:var(--red)">${JSON.stringify(e, null, 2)}</div>`;
+    }
+  }
+
+  // ── MODALS ──
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  });
+
+  // Init
+  loadDashboard();
+</script>
+</body>
+</html>
