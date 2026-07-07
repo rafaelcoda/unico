@@ -5,53 +5,34 @@ const querystring = require('querystring');
 let cachedToken = null;
 let tokenExpiry = null;
 
+const AUTH_URL = 'https://identity.acesso.io/auth/idp';
+
 function generateJWT() {
   const serviceAccount = process.env.UNICO_SERVICE_ACCOUNT;
   const privateKeyPem = process.env.UNICO_PRIVATE_KEY;
-  const authUrl = process.env.UNICO_AUTH_URL || 'https://identity.acesso.io';
-
   if (!serviceAccount || !privateKeyPem) throw new Error('Credenciais nao configuradas');
-
   const now = Math.floor(Date.now() / 1000);
   const b64url = (obj) => Buffer.from(JSON.stringify(obj)).toString('base64')
     .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-
-  const signingInput = `${b64url({alg:'RS256',typ:'JWT'})}.${b64url({iss:serviceAccount,scope:'*',aud:authUrl,exp:now+3600,iat:now})}`;
+  const signingInput = `${b64url({alg:'RS256',typ:'JWT'})}.${b64url({iss:process.env.UNICO_SERVICE_ACCOUNT,scope:'*',aud:AUTH_URL,exp:now+3600,iat:now})}`;
   const pem = privateKeyPem.replace(/\\n/g, '\n');
   const sign = createSign('RSA-SHA256');
   sign.update(signingInput);
-  const sig = sign.sign(pem, 'base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
-  return `${signingInput}.${sig}`;
+  return `${signingInput}.${sign.sign(pem,'base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'')}`;
 }
 
-function postForm(url, body, redirectCount = 0) {
-  if (redirectCount > 5) throw new Error('Muitos redirects');
+function postForm(url, body) {
   return new Promise((resolve, reject) => {
     const data = querystring.stringify(body);
     const parsed = new URL(url);
-    const opts = {
+    const req = https.request({
       hostname: parsed.hostname,
       path: parsed.pathname + parsed.search,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(data),
-      },
-    };
-    const req = https.request(opts, (res) => {
-      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        const location = res.headers.location;
-        // Resolve URL relativa usando o hostname atual
-        const next = location.startsWith('http')
-          ? location
-          : `${parsed.protocol}//${parsed.host}${location}`;
-        console.log('[auth] redirect', res.statusCode, '->', next);
-        // Drena o body antes de redirecionar
-        res.resume();
-        return postForm(next, body, redirectCount + 1).then(resolve).catch(reject);
-      }
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': Buffer.byteLength(data) },
+    }, (res) => {
       let raw = '';
-      res.on('data', chunk => raw += chunk);
+      res.on('data', c => raw += c);
       res.on('end', () => resolve({ status: res.statusCode, body: raw }));
     });
     req.on('error', reject);
@@ -63,28 +44,18 @@ function postForm(url, body, redirectCount = 0) {
 async function getAccessToken() {
   const now = Math.floor(Date.now() / 1000);
   if (cachedToken && tokenExpiry && now < tokenExpiry - 600) return cachedToken;
-
-  const authUrl = process.env.UNICO_AUTH_URL || 'https://identity.acesso.io';
-  console.log('[auth] autenticando em:', authUrl);
-
+  console.log('[auth] autenticando em:', AUTH_URL);
   const jwt = generateJWT();
-  console.log('[auth] JWT gerado, tamanho:', jwt.length);
-
-  const result = await postForm(authUrl, {
+  console.log('[auth] JWT tamanho:', jwt.length);
+  const result = await postForm(AUTH_URL, {
     grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
     assertion: jwt,
   });
-
-  console.log('[auth] status final:', result.status, result.body.slice(0, 200));
-
-  if (result.status !== 200) {
-    throw new Error(`Auth falhou (${result.status}): ${result.body}`);
-  }
-
+  console.log('[auth] status:', result.status, '| body:', result.body.slice(0, 300));
+  if (result.status !== 200) throw new Error(`Auth falhou (${result.status}): ${result.body}`);
   const data = JSON.parse(result.body);
   cachedToken = data.access_token;
   tokenExpiry = now + (data.expires_in || 3600);
-  console.log('[auth] token OK');
   return cachedToken;
 }
 
